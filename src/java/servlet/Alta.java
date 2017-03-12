@@ -52,9 +52,9 @@ public class Alta extends HttpServlet {
             Trainer t = new Trainer(name,pokeballs,potions,0);
             out.println(t);
             if (ejb.insertTrainer(t)) {
-                out.println("Ciudad dada de alta.");
+                out.println("entrenador dada de alta.");
             } else {
-                out.println("Ya existe una ciudad con ese código postal.");
+                out.println("Ya existe este entrenador.");
             }
             out.println("</body>");
             out.println("</html>");
