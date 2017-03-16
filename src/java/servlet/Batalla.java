@@ -57,21 +57,125 @@ public class Batalla extends HttpServlet {
                 out.println("<option value=\"" + t.getName() + "\">" + t.getName() + "</option>");
             }
             out.println("</select>");
-            out.println("<input type=\"submit\" name=\"trainer\" value=\"show pokemons\">");
+
+            out.println("<form method=\"POST\">");
+            out.println("<select name=\"trainersDos\">");
+            for (Trainer t : trainers) {
+                out.println("<option value=\"" + t.getName() + "\">" + t.getName() + "</option>");
+            }
+            out.println("</select>");
+            out.println("<input type=\"submit\" name=\"trainer\" value=\"trainer\">");
             out.println("</form>");
-            System.out.println(request.getParameter("show pokemons"));
-            if ("trainer".equals(request.getParameter("show pokemons"))) {
+
+            if ("trainer".equals(request.getParameter("trainer"))) {
                 out.println("<form method=\"POST\">");
+                Trainer trainer = ejb.findTrainerByName(request.getParameter("trainers"));
                 out.println("<select name=\"pokemon\">");
-                Trainer trainer = ejb.findTrainerByName(request.getParameter("trainer"));
                 for (Pokemon p : trainer.getPokemonCollection()) {
                     out.println("<option value=\"" + p.getName() + "\">" + p.getName() + "</option>");
                 }
                 out.println("</select>");
-                out.println("<input type=\"submit\" name=\"pokemon\" value=\"pokemon\">");
+
+                out.println("<form method=\"POST\">");
+                Trainer trainerDos = ejb.findTrainerByName(request.getParameter("trainersDos"));
+                out.println("<select name=\"pokemonDos\">");
+                for (Pokemon p : trainerDos.getPokemonCollection()) {
+                    out.println("<option value=\"" + p.getName() + "\">" + p.getName() + "</option>");
+                }
+                out.println("</select>");
+                out.println("<input type=\"submit\" name=\"batalla\" value=\"batalla\">");
                 out.println("</form>");
             }
 
+            if ("batalla".equals(request.getParameter("batalla"))) {
+
+                Pokemon pokemon = ejb.getPokemonByName(request.getParameter("pokemon"));
+                Pokemon pokemon2 = ejb.getPokemonByName(request.getParameter("pokemonDos"));
+
+                if (pokemon.getSpeed() > pokemon2.getSpeed()) {
+
+                    boolean muerto = false;
+                    boolean turno = false;
+                    do {
+                        if (!turno) {
+                            pokemon2.setLife(pelea(turno, pokemon, pokemon2));
+                            turno = true;
+                        } else {
+                            pelea(turno, pokemon, pokemon2);
+                            turno = false;
+                        }
+                        if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
+                            muerto = true;
+                        }
+                    } while (!muerto);
+
+                    ejb.updatePokemon(pokemon);
+                    ejb.updatePokemon(pokemon2);
+
+                } else if (pokemon.getSpeed() == pokemon2.getSpeed()) {
+                    int ran = (int) (Math.random() * 0) + 3;
+
+                    if (ran == 1) {
+                        boolean muerto = false;
+                        boolean turno = false;
+                        do {
+                            if (!turno) {
+                                pokemon2.setLife(pelea(turno, pokemon, pokemon2));
+                                turno = true;
+                            } else {
+                                pelea(turno, pokemon, pokemon2);
+                                turno = false;
+                            }
+                            if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
+                                muerto = true;
+                            }
+                        } while (!muerto);
+
+                        ejb.updatePokemon(pokemon);
+                        ejb.updatePokemon(pokemon2);
+                    } else {
+                        boolean muerto = false;
+                        boolean turno = false;
+                        do {
+                            if (!turno) {
+                                pokemon2.setLife(pelea(turno, pokemon, pokemon2));
+                                turno = true;
+                            } else {
+                                pelea(turno, pokemon, pokemon2);
+                                turno = false;
+                            }
+                            if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
+                                muerto = true;
+                            }
+                        } while (!muerto);
+
+                        ejb.updatePokemon(pokemon);
+                        ejb.updatePokemon(pokemon2);
+                    }
+                } else {
+                    boolean muerto = false;
+                    boolean turno = true;
+                    do {
+                        if (!turno) {
+                            pokemon2.setLife(pelea(turno, pokemon, pokemon2));
+                            turno = true;
+                        } else {
+                            pelea(turno, pokemon, pokemon2);
+                            turno = false;
+                        }
+                        if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
+                            muerto = true;
+                        }
+                    } while (!muerto);
+
+                    ejb.updatePokemon(pokemon);
+                    ejb.updatePokemon(pokemon2);
+                }
+                out.println("<h1>Fin de batalla</h1>");
+                out.print("<form action=\"index.html\" method=\"POST\">\n"
+                            + "<input type=\"submit\" value=\"inicio\">\n"
+                            + "</form>");
+            }
             out.println("</body>");
             out.println("</html>");
         }
@@ -116,4 +220,19 @@ public class Batalla extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    public int pelea(boolean turno, Pokemon p, Pokemon p2) {
+
+        int vida = 0;
+
+        if (!turno) {
+            vida = p2.getLife() - (p.getAttack() + (p.getLevel() * 2) - (p2.getDefense() / 3));
+        } else {
+            vida = p.getLife() - (p2.getAttack() + (p2.getLevel() * 2) - (p.getDefense() / 3));
+        }
+
+        if (vida < 0) {
+            vida = 0;
+        }
+        return vida;
+    }
 }

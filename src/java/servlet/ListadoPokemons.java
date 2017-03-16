@@ -6,13 +6,10 @@
 package servlet;
 
 import beans.Bean;
-import entities.Trainer;
+import entities.Pokemon;
 import java.io.IOException;
 import java.io.PrintWriter;
-import static java.lang.Thread.sleep;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,9 +21,9 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Alan
  */
-@WebServlet(name = "ConseguirPociones", urlPatterns = {"/ConseguirPociones"})
-public class ConseguirPociones extends HttpServlet {
-    
+@WebServlet(name = "ListadoPokemons", urlPatterns = {"/ListadoPokemons"})
+public class ListadoPokemons extends HttpServlet {
+
     @EJB
     Bean ejb;
     
@@ -38,46 +35,40 @@ public class ConseguirPociones extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ConseguirPociones</title>");
+            out.println("<title>Servlet ListadoPokemons</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ConseguirPociones at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ListadoPokemons at " + request.getContextPath() + "</h1>");
             
-            List<Trainer> trainers = ejb.getAllTrainers();
+            List<Pokemon> pokemons = ejb.pokemonsSortByLvlLife();
             
-            out.println("<form method=\"POST\">");
-            out.println("<select name=\"trainer\">");
-            for (Trainer t : trainers) {
-                out.println("<option value=\"" + t.getName() + "\">" + t.getName() + " Puntos: " + t.getPoints() + "</option>");
-            }
-            out.println("</select>");
-            out.println("<input type=\"submit\" name=\"pociones\" value=\"pociones\">");
-            out.println("</form>");
-            
-            if ("pociones".equals(request.getParameter("pociones"))) {
-                
-                Trainer t = ejb.findTrainerByName(request.getParameter("trainer"));
-                
-                if (t.getPoints()< 10) {
-                    out.print("<h2>Te faltan " + (10 - t.getPoints()) + " para poder comprar una pocion</h2>");
-                    
-                    out.print("<form action=\"index.html\" method=\"POST\">\n"
-                            + "<input type=\"submit\" value=\"inicio\">\n"
-                            + "</form>");
-                } else {
-                    t.setPoints(t.getPoints() - 10);
-                    t.setPotions(t.getPotions() + 1);
+            out.println("<table style=\"border: 1px solid\">");
+            out.println("<tr>");
+            out.println("<th> Nombre <td>");
+            out.println("<th> Tipo <td>");
+            out.println("<th> Habilidad<td>");
+            out.println("<th> Ataque <td>");
+            out.println("<th> Velocidad <td>");
+            out.println("<th> Vida <td>");
+            out.println("<th> Nivel <td>");
+            out.println("</tr>");
+            for (Pokemon p : pokemons) {
 
-                    ejb.updateTrainer(t);
-//                    sleep(500);
-//                    out.println("<h2>Tienes " + t.getPotions() + " Pociones</h2>");
-//                    sleep(5000);
-                    //response.sendRedirect("index.html");
-                    out.print("<form action=\"index.html\" method=\"POST\">\n"
-                            + "<input type=\"submit\" value=\"inicio\">\n"
-                            + "</form>");
-                }
+                out.println("<tr>");
+                out.println("<td>" + p.getName() + "<td>");
+                out.println("<td>" + p.getType() + "<td>");
+                out.println("<td>" + p.getAbility() + "<td>");
+                out.println("<td>" + p.getAttack() + "<td>");
+                out.println("<td>" + p.getSpeed() + "<td>");
+                out.println("<td>" + p.getLife() + "<td>");
+                out.println("<td>" + p.getLevel() + "<td>");
+                out.println("</tr>");
+
             }
+            out.println("</table>");
+            out.println("<form action=\"index.html\" method=\"POST\">\n" +
+                                "<input type=\"submit\" value=\"menu principal\">\n" +
+                                "</form>");
             out.println("</body>");
             out.println("</html>");
         }
