@@ -104,13 +104,13 @@ public class Batalla extends HttpServlet {
                             pelea(turno, pokemon, pokemon2);
                             turno = false;
                         }
-                        if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
-                            muerto = true;
-                        }
+                        String check = updateData(muerto, pokemon, pokemon2);
+                        
+                       if(!check.equals("")){
+                           muerto = true;
+                           out.print(check);
+                       }
                     } while (!muerto);
-
-                    ejb.updatePokemon(pokemon);
-                    ejb.updatePokemon(pokemon2);
 
                 } else if (pokemon.getSpeed() == pokemon2.getSpeed()) {
                     int ran = (int) (Math.random() * 0) + 3;
@@ -126,13 +126,13 @@ public class Batalla extends HttpServlet {
                                 pelea(turno, pokemon, pokemon2);
                                 turno = false;
                             }
-                            if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
-                                muerto = true;
-                            }
-                        } while (!muerto);
-
-                        ejb.updatePokemon(pokemon);
-                        ejb.updatePokemon(pokemon2);
+                            String check = updateData(muerto, pokemon, pokemon2);
+                        
+                       if(!check.equals("")){
+                           muerto = true;
+                           out.print(check);
+                       }
+                    } while (!muerto);
                     } else {
                         boolean muerto = false;
                         boolean turno = false;
@@ -144,13 +144,13 @@ public class Batalla extends HttpServlet {
                                 pelea(turno, pokemon, pokemon2);
                                 turno = false;
                             }
-                            if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
-                                muerto = true;
-                            }
-                        } while (!muerto);
-
-                        ejb.updatePokemon(pokemon);
-                        ejb.updatePokemon(pokemon2);
+                            String check = updateData(muerto, pokemon, pokemon2);
+                        
+                       if(!check.equals("")){
+                           muerto = true;
+                           out.print(check);
+                       }
+                    } while (!muerto);
                     }
                 } else {
                     boolean muerto = false;
@@ -163,18 +163,20 @@ public class Batalla extends HttpServlet {
                             pelea(turno, pokemon, pokemon2);
                             turno = false;
                         }
-                        if (pokemon.getLife() == 0 || pokemon2.getLife() == 0) {
-                            muerto = true;
-                        }
+                        
+                        String check = updateData(muerto, pokemon, pokemon2);
+                        
+                       if(!check.equals("")){
+                           muerto = true;
+                           out.print(check);
+                       }
                     } while (!muerto);
 
-                    ejb.updatePokemon(pokemon);
-                    ejb.updatePokemon(pokemon2);
                 }
                 out.println("<h1>Fin de batalla</h1>");
                 out.print("<form action=\"index.html\" method=\"POST\">\n"
-                            + "<input type=\"submit\" value=\"inicio\">\n"
-                            + "</form>");
+                        + "<input type=\"submit\" value=\"inicio\">\n"
+                        + "</form>");
             }
             out.println("</body>");
             out.println("</html>");
@@ -234,5 +236,39 @@ public class Batalla extends HttpServlet {
             vida = 0;
         }
         return vida;
+    }
+
+    public String updateData(boolean muerto, Pokemon pokemon, Pokemon pokemon2) {
+
+        String check = "";
+        if (pokemon2.getLife() == 0) {
+            muerto = true;
+            check = "<h1>Gana el pokemon " + pokemon.getName() + "</h1>";
+            pokemon.setLevel(pokemon.getLevel() + 1);
+
+            pokemon.getTrainer().setPoints(pokemon.getTrainer().getPoints() + 10);
+            ejb.updateTrainer(pokemon.getTrainer());
+
+            pokemon2.getTrainer().setPoints(pokemon2.getTrainer().getPoints() + 1);
+            ejb.updateTrainer(pokemon2.getTrainer());
+            
+            ejb.updatePokemon(pokemon);
+            ejb.updatePokemon(pokemon2);
+        }
+        if (pokemon.getLife() == 0) {
+            muerto = true;
+            check = "<h1>Gana el pokemon " + pokemon2.getName() + "</h1>";
+            pokemon.setLevel(pokemon2.getLevel() + 1);
+
+            pokemon.getTrainer().setPoints(pokemon2.getTrainer().getPoints() + 10);
+            ejb.updateTrainer(pokemon2.getTrainer());
+
+            pokemon.getTrainer().setPoints(pokemon.getTrainer().getPoints() + 1);
+            ejb.updateTrainer(pokemon.getTrainer());
+            
+            ejb.updatePokemon(pokemon);
+            ejb.updatePokemon(pokemon2);
+        }
+        return check;
     }
 }
