@@ -42,6 +42,18 @@ public class Bean {
         em.close();
         return encontrado != null;
     }
+    
+    public void updateTrainer(Trainer t){
+        EntityManager em = emf.createEntityManager();
+        em.merge(t);
+    }
+    
+    public List<Trainer> getAllTrainers(){
+        List<Trainer> trainers = emf.createEntityManager().createNamedQuery("Trainer.findAll").getResultList();
+        
+        return trainers;
+    }
+    
     public Trainer findTrainerByName(String name){
         EntityManager em = emf.createEntityManager();
         Trainer encontrado = em.find(Trainer.class, name);
@@ -57,6 +69,17 @@ public class Bean {
         List<Trainer> trainers = q.getResultList();*/
         List<Trainer> trainers = em.createNamedQuery("Trainer.findAll").getResultList();
         trainers.stream().filter((t) -> (t.getPokemonCollection().size() >= 6)).forEachOrdered((t) -> {
+            trainers.remove(t);
+        });
+        em.close();
+        return trainers;
+    }
+    
+    public List<Trainer> GetTrainersBattle(){
+        EntityManager em = emf.createEntityManager();
+        
+        List<Trainer> trainers = em.createNamedQuery("Trainer.findAll").getResultList();
+        trainers.stream().filter((t) -> (t.getPokemonCollection().size() < 1)).forEachOrdered((t) -> {
             trainers.remove(t);
         });
         em.close();
@@ -91,16 +114,5 @@ public class Bean {
             return true;
         }
         return false;
-    }
-    
-    public List<Trainer> GetTrainersBattle(){
-        EntityManager em = emf.createEntityManager();
-        
-        List<Trainer> trainers = em.createNamedQuery("Trainer.findAll").getResultList();
-        trainers.stream().filter((t) -> (t.getPokemonCollection().size() < 1)).forEachOrdered((t) -> {
-            trainers.remove(t);
-        });
-        em.close();
-        return trainers;
     }
 }
