@@ -5,8 +5,12 @@
  */
 package servlet;
 
+import beans.Bean;
+import entities.Pokemon;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,15 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "BatallasGanadas", urlPatterns = {"/BatallasGanadas"})
 public class BatallasGanadas extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    @EJB
+    Bean ejb;
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -41,6 +39,26 @@ public class BatallasGanadas extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet BatallasGanadas at " + request.getContextPath() + "</h1>");
+            
+            List<Pokemon> pokemons = ejb.pokemonsSortByLvlLife();
+            
+            out.println("<table style=\"border: 1px solid\">");
+            out.println("<tr>");
+            out.println("<th> Nombre <td>");
+            out.println("<th> Batallas ganadas <td>");
+            out.println("</tr>");
+            for (Pokemon p : pokemons) {
+
+                out.println("<tr>");
+                out.println("<td>" + p.getName() + "<td>");
+                out.println("<td>" + p.getLevel()+ "<td>");
+                out.println("</tr>");
+
+            }
+            out.println("</table>");
+            out.println("<form action=\"index.html\" method=\"POST\">\n" +
+                                "<input type=\"submit\" value=\"menu principal\">\n" +
+                                "</form>");
             out.println("</body>");
             out.println("</html>");
         }
